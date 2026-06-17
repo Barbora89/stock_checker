@@ -22,10 +22,10 @@ jobs:
           key: alert-state
 
       - name: Install dependencies
-        run: pip install -r stock_reminder/requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Check prices
-        run: python stock_reminder/stock_reminder.py
+        run: python stock_reminder.py
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
