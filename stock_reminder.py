@@ -1,16 +1,13 @@
-import yfinance as yf
 import requests
-import urllib3
 import os
 import json
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 STOCKS = {
-    "GEN": {"above": 24}
+    "GEN": {"above": 1}
 }
 
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "")
+FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY", "")
 STATE_FILE = "alert_state.json"
 
 
@@ -20,24 +17,30 @@ def load_state():
             return json.load(f)
     return {}
 
+
 def save_state(state):
     with open(STATE_FILE, "w") as f:
         json.dump(state, f)
 
+
+def get_price(ticker):
+    url = f"https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_API_KEY}"
+    response = requests.get(url)
+    data = response.json()
+    return data["c"]
+
+
 def notify(title, message):
     if DISCORD_WEBHOOK_URL:
-        requests.post(DISCORD_WEBHOOK_URL, json={"content": f"**{title}** {message}"}, verify=False)
+        requests.post(DISCORD_WEBHOOK_URL, json={"content": f"**{title}** {message}"})
 
 
 def check_prices():
     state = load_state()
-    session = requests.Session()
-    session.verify = False
 
     for ticker, thresholds in STOCKS.items():
         try:
-            stock = yf.Ticker(ticker, session=session)
-            price = stock.fast_info["last_price"]
+            price = get_price(ticker)
             print(f"{ticker}: ${price:.2f}")
 
             key_above = f"{ticker}_above"
@@ -53,5 +56,6 @@ def check_prices():
             print(f"Chyba u {ticker}: {e}")
 
     save_state(state)
+
 
 check_prices()
