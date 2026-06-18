@@ -3,7 +3,7 @@ import os
 import json
 
 STOCKS = {
-    "GEN": {"above": 1}
+    "GEN": {"above": 24}
 }
 
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "")
@@ -47,7 +47,7 @@ def check_prices():
             if thresholds.get("above"):
                 if price > thresholds["above"]:
                     if not state.get(key_above):
-                        notify(f"📈 {ticker} roste!", f"Cena ${price:.2f} je nad {thresholds['above']}")
+                        notify(f"📈 {ticker} roste!", f"Cena ${price:.2f}")
                         state[key_above] = True
                 else:
                     state[key_above] = False
