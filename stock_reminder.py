@@ -3,7 +3,7 @@ import os
 import json
 
 STOCKS = {
-    "GEN": {"above": 26.50}
+    "GEN": {"above": 10.0}
 }
 
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "")
