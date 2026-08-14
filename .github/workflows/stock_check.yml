@@ -2,8 +2,10 @@ name: Stock Checker
 
 on:
   schedule:
-    - cron: "0 8-16 * * 1-5"
+    # Běží každou celou hodinu od 13:00 do 20:00 UTC (pondělí až pátek)
+    - cron: "0 13-20 * * 1-5"
   workflow_dispatch:
+
 
 jobs:
   check:
@@ -11,15 +13,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ZÍSKÁNÍ AKTUÁLNÍHO ČASU: Klíčové pro správné fungování cache v Actions
+      - name: Get Current Timestamp
+        id: timestamp
+        run: echo "date=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_OUTPUT
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      # OPRAVENÁ CACHE: Nyní bude správně stahovat nejnovější stav a ukládat změny
       - name: Restore alert state
         uses: actions/cache@v4
         with:
           path: alert_state.json
-          key: alert-state-${{ github.run_id }}
+          key: alert-state-${{ steps.timestamp.outputs.date }}
           restore-keys: |
             alert-state-
 
@@ -31,5 +39,6 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+
 
 
