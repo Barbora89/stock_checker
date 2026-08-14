@@ -37,6 +37,13 @@ def notify(title, message):
 
 def check_prices():
     state = load_state()
+    
+    # Zjistíme, jak byl skript v GitHub Actions spuštěn
+    event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+    is_manual_run = (event_name == "workflow_dispatch")
+
+    if is_manual_run:
+        print("🤖 Skript byl spuštěn RUČNĚ. Cache bude pro toto spuštění ignorována.")
 
     for ticker, thresholds in STOCKS.items():
         try:
@@ -45,10 +52,13 @@ def check_prices():
 
             key_above = f"{ticker}_above"
             if thresholds.get("above"):
-                if price > thresholds["above"]:
-                    if not state.get(key_above):
+                if price >= thresholds["above"]:
+                    # ZMĚNA: Notifikace odejde, pokud stav ještě není v cache NEBO pokud skript pouštíte ručně
+                    if not state.get(key_above) or is_manual_run:
                         notify(f"📈 {ticker} roste!", f"Cena ${price:.2f}")
                         state[key_above] = True
+                    else:
+                        print(f"ℹ️ {ticker} je nad hranicí, ale upozornění už v cache existuje.")
                 else:
                     state[key_above] = False
 
@@ -56,6 +66,3 @@ def check_prices():
             print(f"Chyba u {ticker}: {e}")
 
     save_state(state)
-
-
-check_prices()

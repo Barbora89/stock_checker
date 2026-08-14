@@ -2,7 +2,7 @@ name: Stock Checker
 
 on:
   schedule:
-    # Běží každou celou hodinu od 13:00 do 20:00 UTC (pondělí až pátek)
+    # Běží každou celou hodinu od 13:00 do 20:00 UTC (pondělí až pátek) to by melo odpovidat americkemu casu kdzy se obchoduji akcie 
     - cron: "0 13-22 * * 1-5"
   workflow_dispatch:
 
