@@ -47,9 +47,7 @@ def check_prices():
 
     for ticker, thresholds in STOCKS.items():
         try:
-            #price = get_price(ticker)
-            #test check prices 
-            price = 100
+            price = get_price(ticker)
             print(f"{ticker}: ${price:.2f}")
 
             key_above = f"{ticker}_above"
